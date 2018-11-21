@@ -91,5 +91,5 @@ func NewModelWithFixturesAndContext(box packd.Box, ctx *plush.Context) (*Model, 
 func NewModelWithFixtures(box packd.Box) (*Model, error) {
 	m := NewModel()
 	m.Fixtures = box
-	return m, fix.Init(box, fix.PlushConfig{})
+	return m, fix.Init(box)
 }
