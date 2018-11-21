@@ -3,12 +3,13 @@ package suite
 import (
 	"fmt"
 	"github.com/gobuffalo/plush"
+	"github.com/jinzhu/gorm"
 	"strings"
 
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/packd"
 	"github.com/gobuffalo/pop"
-	"github.com/gobuffalo/suite/fix"
+	"github.com/boehmli/suite-gorm/fix"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -17,6 +18,7 @@ type Model struct {
 	suite.Suite
 	*require.Assertions
 	DB       *pop.Connection
+	GormDB   *gorm.DB
 	Fixtures packd.Finder
 }
 
@@ -67,6 +69,11 @@ func NewModel() *Model {
 	if err == nil {
 		m.DB = c
 	}
+	g, err := gorm.Open(c.Dialect.Details().Dialect, c.URL())
+	if err == nil {
+		g = g.LogMode(true)
+		m.GormDB = g
+	}
 	return m
 }
 
@@ -84,5 +91,5 @@ func NewModelWithFixturesAndContext(box packd.Box, ctx *plush.Context) (*Model, 
 func NewModelWithFixtures(box packd.Box) (*Model, error) {
 	m := NewModel()
 	m.Fixtures = box
-	return m, fix.Init(box)
+	return m, fix.Init(box, fix.PlushConfig{})
 }
